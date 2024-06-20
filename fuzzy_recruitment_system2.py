@@ -313,21 +313,21 @@ print(pseudorandom_cvs)
 
 
 
-# Apply the linguistic decision function to the 'Decision' column
-pseudorandom_cvs['Linguistic Decision'] = pseudorandom_cvs['Decision'].apply(linguistic_decision)
+# # Apply the linguistic decision function to the 'Decision' column
+# pseudorandom_cvs['Linguistic Decision'] = pseudorandom_cvs['Decision'].apply(linguistic_decision)
 
-# Display the updated DataFrame with linguistic decisions
-print(pseudorandom_cvs)
+# # Display the updated DataFrame with linguistic decisions
+# print(pseudorandom_cvs)
 
 
-# print(decision.view(sim=recruitment_simulation))
+# # print(decision.view(sim=recruitment_simulation))
 
-#display ranking of CVs based on decision scores
-# Sort the DataFrame by the 'Decision' column in descending order
-pseudorandom_cvs.sort_values(by='Decision', ascending=False, inplace=True)
+# #display ranking of CVs based on decision scores
+# # Sort the DataFrame by the 'Decision' column in descending order
+# pseudorandom_cvs.sort_values(by='Decision', ascending=False, inplace=True)
 
-# Display the updated DataFrame with decision scores and rankings
-print(pseudorandom_cvs)
+# # Display the updated DataFrame with decision scores and rankings
+# print(pseudorandom_cvs)
 
 
 #HISTORGRAM OF DECISION SCORES
@@ -341,43 +341,46 @@ plt.show()
 
 
 
-# Function to check which rules are activated
-def activated_rules(cv):
-    recruitment_simulation.input['experience'] = cv['Experience']
-    recruitment_simulation.input['education'] = cv['Education']
-    recruitment_simulation.input['coding_skills'] = cv['Coding Skills']
-    recruitment_simulation.input['teamwork'] = cv['Teamwork']
-    
-    recruitment_simulation.compute()
-    
-    activated = []
-    for i, rule in enumerate(recruitment_system.rules):
-        if rule.antecedent.activation.reduced_value > 0:
-            activated.append(f'Rule {i+1}')
-    return activated
+#
 
 
 
-# Add activated rules to the DataFrame
-pseudorandom_cvs['Activated Rules'] = pseudorandom_cvs.apply(activated_rules, axis=1)
+def visualize_example_decisions(cvs_df, num_examples=1):
+    sample_cvs = cvs_df.sample(num_examples)
+    for index, cv in sample_cvs.iterrows():
+        recruitment_simulation.input['experience'] = cv['Experience']
+        recruitment_simulation.input['education'] = cv['Education']
+        recruitment_simulation.input['coding_skills'] = cv['Coding Skills']
+        recruitment_simulation.input['teamwork'] = cv['Teamwork']
+        recruitment_simulation.compute()
+        decision_score = recruitment_simulation.output['decision']
 
-# Display the updated DataFrame with activated rules
-print(pseudorandom_cvs[['Experience', 'Education', 'Coding Skills', 'Teamwork', 'Activated Rules']])
+        print(f"\nCV {index}:")
+        print(cv)
+        print(f"Decision Score: {decision_score}")
+        print(f"Linguistic Decision: {linguistic_decision(decision_score)}")
 
-# Visualization of the activated rules for a subset of the CVs
-subset_cvs = pseudorandom_cvs.head(20)  # Take a subset for visualization purposes
-rules_matrix = np.zeros((len(subset_cvs), len(rules)))
+        # Visualize the decision
+        experience.view(sim=recruitment_simulation)
+        # save figure
+        plt.savefig(f'awd\dokumentacja\cv_{index}_experience.png')
+        education.view(sim=recruitment_simulation)
+        #save figure
+        plt.savefig(f'awd\dokumentacja\cv_{index}_education.png')
+        coding_skills.view(sim=recruitment_simulation)
+        #save figure
+        plt.savefig(f'awd\dokumentacja\cv_{index}_coding_skills.png')
+        teamwork.view(sim=recruitment_simulation)
+        #save figure
+        plt.savefig(f'awd\dokumentacja\cv_{index}_teamwork.png')
+        decision.view(sim=recruitment_simulation)
+        #save figures
+        plt.savefig(f'awd\dokumentacja\cv_{index}_decision.png')
+        #hold the plot
 
-for idx, row in subset_cvs.iterrows():
-    activated = row['Activated Rules']
-    for rule in activated:
-        rule_idx = int(rule.split()[1]) - 1
-        rules_matrix[idx, rule_idx] = 1
+        plt.show()
 
-fig, ax = plt.subplots(figsize=(15, 10))
-cax = ax.matshow(rules_matrix, cmap='viridis')
-plt.title('Activated Rules for a Subset of CVs')
-plt.xlabel('Rule Index')
-plt.ylabel('CV Index')
-plt.colorbar(cax, label='Rule Activation')
-plt.show()
+
+# Visualize example decisions
+visualize_example_decisions(pseudorandom_cvs)
+
